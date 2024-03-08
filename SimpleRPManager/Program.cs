@@ -1,4 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Discord;
+using Discord.Addons.Hosting;
+using Discord.Interactions;
+using Discord.WebSocket;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using NpgsqlTypes;
 using Serilog;
 using Serilog.Events;
@@ -9,24 +15,38 @@ public class Program
 {
     public static async Task Main()
     {
-        // load in config file
-        var builder = new ConfigurationBuilder();
-        builder.SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+        HostApplicationBuilder appBuilder = Host.CreateApplicationBuilder();
 
-        IConfiguration config = builder.Build();
+        // Set up logging
+        appBuilder.Logging.ClearProviders();
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(appBuilder.Configuration)
+            .CreateLogger();
+        appBuilder.Logging.AddSerilog();
+        
+        // Set up services here
+        appBuilder.Services.AddDiscordHost((config, _) =>
+        {
+            config.SocketConfig = new DiscordSocketConfig()
+            {
+                LogLevel = LogSeverity.Verbose,
+                AlwaysDownloadUsers = true,
+                MessageCacheSize = 200,
+                GatewayIntents = GatewayIntents.All
+            };
 
-        // Create the default logger
+            config.Token = appBuilder.Configuration["Discord:BotToken"] ?? throw new InvalidOperationException("Bot Token must be set in the configuration.");
+        });
+        appBuilder.Services.AddInteractionService((config, _) =>
+        {
+            config.LogLevel = LogSeverity.Verbose;
+            config.UseCompiledLambda = true;
+        });
+        
+        IHost app = appBuilder.Build();
 
-        var logger = new LoggerConfiguration()
-        .ReadFrom.Configuration(config)
-        .CreateLogger();
-
-        Log.Logger = logger;
-
-        logger.Error("Test!");
-
-        await logger.DisposeAsync();
-
+        Log.Warning("App Generic Host built, running...");
+        
+        await app.RunAsync();
     }
 }
