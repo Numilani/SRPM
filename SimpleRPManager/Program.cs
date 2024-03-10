@@ -1,17 +1,16 @@
 ﻿using Discord;
 using Discord.Addons.Hosting;
-using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NpgsqlTypes;
 using Serilog;
-using Serilog.Events;
-using Serilog.Sinks.PostgreSQL;
-using Serilog.Sinks.PostgreSQL.ColumnWriters;
+using SimpleRPManager.Context;
 
-public class Program
+namespace SimpleRPManager;
+
+public static class Program
 {
     public static async Task Main()
     {
@@ -25,6 +24,12 @@ public class Program
         appBuilder.Logging.AddSerilog();
         
         // Set up services here
+
+        appBuilder.Services.AddDbContext<AppDbContext>(opts =>
+        {
+            opts.UseNpgsql(appBuilder.Configuration["ConnectionStrings:Default"]);
+        });
+        
         appBuilder.Services.AddDiscordHost((config, _) =>
         {
             config.SocketConfig = new DiscordSocketConfig()
@@ -32,7 +37,7 @@ public class Program
                 LogLevel = LogSeverity.Verbose,
                 AlwaysDownloadUsers = true,
                 MessageCacheSize = 200,
-                GatewayIntents = GatewayIntents.All
+                GatewayIntents = GatewayIntents.AllUnprivileged
             };
 
             config.Token = appBuilder.Configuration["Discord:BotToken"] ?? throw new InvalidOperationException("Bot Token must be set in the configuration.");
