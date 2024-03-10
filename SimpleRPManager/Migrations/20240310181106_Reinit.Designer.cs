@@ -11,8 +11,8 @@ using SimpleRPManager.Context;
 namespace SimpleRPManager.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240310071119_Init")]
-    partial class Init
+    [Migration("20240310181106_Reinit")]
+    partial class Reinit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,11 +26,8 @@ namespace SimpleRPManager.Migrations
 
             modelBuilder.Entity("SimpleRPManager.Entities.Character", b =>
                 {
-                    b.Property<long>("CharacterId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("CharacterId"));
+                    b.Property<string>("CharacterId")
+                        .HasColumnType("text");
 
                     b.Property<decimal>("GuildId")
                         .HasColumnType("numeric(20,0)");
@@ -62,6 +59,29 @@ namespace SimpleRPManager.Migrations
                     b.ToTable("GuildSettings");
                 });
 
+            modelBuilder.Entity("SimpleRPManager.Entities.InventoryItem", b =>
+                {
+                    b.Property<string>("ItemId")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("GuildId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OwnerCharacterId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("ItemId");
+
+                    b.HasIndex("OwnerCharacterId");
+
+                    b.ToTable("InventoryItems");
+                });
+
             modelBuilder.Entity("SimpleRPManager.Entities.PlayerSettings", b =>
                 {
                     b.Property<decimal>("GuildId")
@@ -79,6 +99,22 @@ namespace SimpleRPManager.Migrations
                     b.HasKey("GuildId", "PlayerId");
 
                     b.ToTable("PlayerSettings");
+                });
+
+            modelBuilder.Entity("SimpleRPManager.Entities.InventoryItem", b =>
+                {
+                    b.HasOne("SimpleRPManager.Entities.Character", "Owner")
+                        .WithMany("Inventory")
+                        .HasForeignKey("OwnerCharacterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("SimpleRPManager.Entities.Character", b =>
+                {
+                    b.Navigation("Inventory");
                 });
 #pragma warning restore 612, 618
         }

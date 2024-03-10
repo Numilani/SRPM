@@ -32,6 +32,11 @@
       <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
       <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
       <PackageReference Include="Serilog.Sinks.Postgresql.Alternative" Version="4.0.2" />
+      <PackageReference Include="shortid" Version="4.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Migrations\" />
     </ItemGroup>
 
 </Project>
