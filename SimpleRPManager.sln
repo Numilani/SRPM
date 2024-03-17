@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleRPManager", "SimpleRPManager\SimpleRPManager.csproj", "{8AEB18AD-D34A-4A7E-BAF5-C1B004CFF9C6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRPM-Dashboard", "SRPM-Dashboard\SRPM-Dashboard.csproj", "{79B1341F-B608-4920-97E3-C9348D5D803B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{8AEB18AD-D34A-4A7E-BAF5-C1B004CFF9C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8AEB18AD-D34A-4A7E-BAF5-C1B004CFF9C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8AEB18AD-D34A-4A7E-BAF5-C1B004CFF9C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79B1341F-B608-4920-97E3-C9348D5D803B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79B1341F-B608-4920-97E3-C9348D5D803B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79B1341F-B608-4920-97E3-C9348D5D803B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79B1341F-B608-4920-97E3-C9348D5D803B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
