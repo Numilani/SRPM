@@ -21,6 +21,25 @@ internal static class IdentityComponentsEndpointRouteBuilderExtensions
 
         var accountGroup = endpoints.MapGroup("/Account");
 
+        accountGroup.MapGet("/DiscordLogin", (
+            HttpContext context,
+            [FromServices] SignInManager<ApplicationUser> signInManager) =>
+        {
+            IEnumerable<KeyValuePair<string, StringValues>> query =
+            [
+                new("ReturnUrl", "https://localhost:7137"), //TODO: make this configurable
+                new("Action", ExternalLogin.LoginCallbackAction)
+            ];
+
+            var redirectUrl = UriHelper.BuildRelative(
+                context.Request.PathBase,
+                "/Account/ExternalLogin",
+                QueryString.Create(query));
+
+            var properties = signInManager.ConfigureExternalAuthenticationProperties("Discord", redirectUrl);
+            return TypedResults.Challenge(properties, ["Discord"]);
+        });
+        
         accountGroup.MapPost("/PerformExternalLogin", (
             HttpContext context,
             [FromServices] SignInManager<ApplicationUser> signInManager,
