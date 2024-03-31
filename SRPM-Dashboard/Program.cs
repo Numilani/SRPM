@@ -21,6 +21,11 @@ builder.Services.AddAuthentication(options =>
         options.DefaultScheme = IdentityConstants.ApplicationScheme;
         options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
     })
+    .AddDiscord(opts =>
+    {
+        opts.ClientId = builder.Configuration["Discord:OAuthClientId"];
+        opts.ClientSecret = builder.Configuration["Discord:OAuthClientSecret"];
+    })
     .AddIdentityCookies();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
@@ -54,6 +59,9 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

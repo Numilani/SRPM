@@ -6,3 +6,6 @@ riderModule.iml
 /.idea
 SimpleRPManager/appsettings.json
 SimpleRPManager/err.log
+SRPM-Dashboard/appsettings.json
+SRPM-Dashboard/appsettings.Development.json
+SRPM-Dashboard/err.log

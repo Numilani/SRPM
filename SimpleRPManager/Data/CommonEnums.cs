@@ -1,6 +1,6 @@
 namespace SimpleRPManager.Data;
 
-public enum CharacterStatus
+public enum CharacterActivityStatus
 {
     ACTIVE = 0,
     RETIRED = 1,

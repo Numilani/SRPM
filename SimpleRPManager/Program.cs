@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using SimpleRPManager.Context;
+using SimpleRPManager.Services;
 
 namespace SimpleRPManager;
 
@@ -37,7 +38,7 @@ public static class Program
                 LogLevel = LogSeverity.Verbose,
                 AlwaysDownloadUsers = true,
                 MessageCacheSize = 200,
-                GatewayIntents = GatewayIntents.AllUnprivileged
+                GatewayIntents = GatewayIntents.All
             };
 
             config.Token = appBuilder.Configuration["Discord:BotToken"] ?? throw new InvalidOperationException("Bot Token must be set in the configuration.");
@@ -47,10 +48,9 @@ public static class Program
             config.LogLevel = LogSeverity.Verbose;
             config.UseCompiledLambda = true;
         });
+        appBuilder.Services.AddHostedService<InteractionHandler>();
         
         IHost app = appBuilder.Build();
-
-        Log.Warning("App Generic Host built, running...");
         
         await app.RunAsync();
     }
