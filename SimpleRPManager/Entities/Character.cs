@@ -9,10 +9,11 @@ using SimpleRPManager.Services;
 namespace SimpleRPManager.Entities;
 
 [Table("Characters")]
-public class Character(ulong guildId, string name)
+public class Character(ulong guildId, ulong ownerId, string name)
 {
     [Key] public string CharacterId { get; set; } = CommonServices.GenerateSimpleUid();
     public ulong GuildId { get; set; } = guildId;
+    public ulong OwnerId { get; set; } = ownerId;
 
     public CharacterActivityStatus ActivityStatus { get; set; } = CharacterActivityStatus.ACTIVE;
 

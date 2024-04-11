@@ -17,7 +17,7 @@ public class CharacterAutocompleteHandler : AutocompleteHandler
         IParameterInfo parameter, IServiceProvider services)
     {
         var results = new List<AutocompleteResult>();
-        Db.Characters.ToList().ForEach(x => results.Add(new AutocompleteResult(x.Name, x.CharacterId)));
+        Db.Characters.Where(x => context.User.Id == x.OwnerId).ToList().ForEach(x => results.Add(new AutocompleteResult(x.Name, x.CharacterId)));
         return AutocompletionResult.FromSuccess(results.Take(25));
     }
 }

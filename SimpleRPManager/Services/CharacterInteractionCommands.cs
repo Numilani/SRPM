@@ -29,7 +29,7 @@ public class CharacterInteractionCommands : InteractionModuleBase<SocketInteract
     [ModalInteraction("create_char")]
     public async Task CreateCharacterModalResponse(EditCharacterModal modal)
     {
-        var character = new Character(Context.Guild.Id, modal.Name);
+        var character = new Character(Context.Guild.Id, Context.User.Id, modal.Name);
         if (DB.Characters.Where(x => x.Name == character.Name).Any())
         {
             await RespondAsync("A character with this name already exists!");
