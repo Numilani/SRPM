@@ -11,7 +11,7 @@ public class PlayerSettings(ulong guildId, ulong playerId)
     public ulong GuildId { get; set; } = guildId;
     public ulong PlayerId { get; set; } = playerId;
 
-    public uint? ActiveCharacterId { get; set; }
+    public string? ActiveCharacterId { get; set; }
     public bool AutoSpeakAsActiveCharacter { get; set; }
     
 }
