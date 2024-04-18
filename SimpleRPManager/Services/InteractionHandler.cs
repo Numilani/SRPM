@@ -6,8 +6,10 @@ using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using SimpleRPManager.Context;
 using IResult = Discord.Interactions.IResult;
 
 namespace SimpleRPManager.Services;
@@ -67,6 +69,20 @@ public class InteractionHandler : DiscordClientService
         //     context: context,
         //     argPos: argPos,
         //     services: null);
+        if (arg.Channel.GetType() == typeof(SocketTextChannel))
+        {
+            var hooks = await (arg.Channel as SocketTextChannel).GetWebhooksAsync();
+            if (hooks.Count(x => x.Name.StartsWith("SRPM_")) > 0)
+            {
+                var db = _provider.GetRequiredService<AppDbContext>();
+                var settings = db.PlayerSettings.Find((arg.Channel as SocketTextChannel).Guild.Id, arg.Author.Id);
+                if (settings is null || settings.ActiveCharacterId is null) return;
+
+                var character = db.Characters.Find(settings.ActiveCharacterId);
+                await CommonServices.SendWebhookMessage(character, (arg.Channel as SocketTextChannel), arg.Content);
+                await arg.DeleteAsync();
+            }
+        }
     }
 
 private Task ComponentCommandExecuted(ComponentCommandInfo commandInfo, IInteractionContext context, IResult result)

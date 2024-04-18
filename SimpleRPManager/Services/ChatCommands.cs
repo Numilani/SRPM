@@ -22,38 +22,21 @@ public class ChatCommands : InteractionModuleBase<SocketInteractionContext>
     [SlashCommand("sayas", "Speak as an NPC", ignoreGroupNames:true)]
     public async Task SayAs([Autocomplete(typeof(CharacterAutocompleteHandler))] string characterId, string text)
     {
+        await DeferAsync();
+
         var channel = Context.Channel as SocketTextChannel;
         var character = Db.Characters.FirstOrDefault(x => x.CharacterId == characterId);
+            var webhook = await CommonServices.GetChannelWebhook(channel);
 
-        try
-        {
-            var webhook = await GetChannelWebhook(channel);
-            if (webhook is null)
+            if (await CommonServices.SendWebhookMessage(character, channel, text))
             {
-                await RespondAsync("This channel is not set up as an RP channel - you may not speak ICly here!");
-                return;
+                await DeleteOriginalResponseAsync();
+
             }
-            
-            if (character.ImageUrl is not null)
-            {
-                await webhook.SendMessageAsync(text, avatarUrl: character.ImageUrl, username: CultureInfo.CurrentCulture.TextInfo.ToTitleCase(character.Name.ToLower()));
-            }
-            else
-            {
-                await webhook.SendMessageAsync(text, username: CultureInfo.CurrentCulture.TextInfo.ToTitleCase(character.Name.ToLower()));
-            }
-            
-            await RespondAsync("done");
-            await DeleteOriginalResponseAsync();
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Couldn't execute SayAs command");
-            await RespondAsync($"!! Ran into an issue: {ex.Message}", ephemeral:true);
-        }
+            else await RespondAsync($"!! Ran into an issue sending that message, try again later!", ephemeral:true);
     }
     
-    [SlashCommand("makeRPchannel", "Initialize this channel as an RP channel!")]
+    [SlashCommand("make-ic", "Initialize this channel as an RP channel!")]
     public async Task CreateChannelWebhook(SocketTextChannel? channel)
     {
         if (channel.GetWebhooksAsync().Result.Count(x => x.Name.StartsWith("SRPM_")) == 0)
@@ -69,13 +52,6 @@ public class ChatCommands : InteractionModuleBase<SocketInteractionContext>
         }
     }
     
-    private static async Task<DiscordWebhookClient> GetChannelWebhook(SocketTextChannel? channel)
-    {
-        if (channel?.GetWebhooksAsync().Result.Count(x => x.Name.StartsWith("SRPM_")) == 0)
-        {
-            return null;
-        }
-        return new DiscordWebhookClient(channel?.GetWebhooksAsync().Result.First(x => x.Name.StartsWith("SRPM_")));
-    }
+    
 
 }
