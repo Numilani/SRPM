@@ -56,24 +56,12 @@ public class InteractionHandler : DiscordClientService
 
     private async Task HandleMessages(SocketMessage arg)
     {
-        // // Don't process the command if it was a system message
-        // var message = arg as SocketUserMessage;
-        // if (message == null) return;
-        //
-        // // Create a WebSocket-based command context based on the message
-        // var context = new SocketCommandContext(Client, message);
-        //
-        // // Execute the command with the command context we just
-        // // created, along with the service provider for precondition checks.
-        // await _commands.ExecuteAsync(
-        //     context: context,
-        //     argPos: argPos,
-        //     services: null);
         if (arg.Channel.GetType() == typeof(SocketTextChannel))
         {
             var hooks = await (arg.Channel as SocketTextChannel).GetWebhooksAsync();
-            if (hooks.Count(x => x.Name.StartsWith("SRPM_")) > 0)
+            if (hooks.Count(x => x.Name.StartsWith("SRPM_")) > 0 && !arg.Content.StartsWith("!!"))
             {
+                // TODO: move DB access to a service with MemoryCache implementation, to reduce DB calls made on every message
                 var db = _provider.GetRequiredService<AppDbContext>();
                 var settings = db.PlayerSettings.Find((arg.Channel as SocketTextChannel).Guild.Id, arg.Author.Id);
                 if (settings is null || settings.ActiveCharacterId is null) return;

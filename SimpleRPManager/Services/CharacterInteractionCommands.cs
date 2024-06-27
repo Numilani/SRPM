@@ -59,7 +59,7 @@ public class CharacterInteractionCommands : InteractionModuleBase<SocketInteract
         }
     }
 
-    [SlashCommand("setactive", "Set a character as your active character")]
+    [SlashCommand("set-active", "Set a character as your active character")]
     public async Task SetActiveCharacter([Autocomplete(typeof(CharacterAutocompleteHandler))] string characterId)
     {
         await DeferAsync();
@@ -153,8 +153,13 @@ public class CharacterInteractionCommands : InteractionModuleBase<SocketInteract
                 break;
         }
 
-        DB.SaveChanges();
-        
+        var userSettings = DB.PlayerSettings.Find((Context.Guild.Id, Context.User.Id));
+        if (userSettings is not null && userSettings.ActiveCharacterId == characterId)
+        {
+            userSettings.ActiveCharacterId = null;
+        }
+
+        await DB.SaveChangesAsync();
     }
 
     [ModalInteraction("edit_char:*", true)]
