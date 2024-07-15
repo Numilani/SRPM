@@ -50,12 +50,12 @@ public class CharacterInteractionCommands : InteractionModuleBase<SocketInteract
         {
             await DB.Characters.AddAsync(character);
             await DB.SaveChangesAsync();
-            await FollowupAsync($"{character.Name} has been created!");
+            await FollowupAsync($"{character.Name} has been created!", ephemeral: true);
         }
         catch (Exception ex)
         {
             Log.Error(ex, "Failed to save new character");
-            await FollowupAsync($"Something went wrong: {ex.Message}");
+            await FollowupAsync($"Something went wrong: {ex.Message}", ephemeral: true);
         }
     }
 
@@ -77,13 +77,13 @@ public class CharacterInteractionCommands : InteractionModuleBase<SocketInteract
 
         if (character is null)
         {
-            await FollowupAsync("Wasn't able to find that character!");
+            await FollowupAsync("Wasn't able to find that character!", ephemeral: true);
             return;
         }
 
         userSettings.ActiveCharacterId = character.CharacterId;
         await DB.SaveChangesAsync();
-        await FollowupAsync($"{character.Name} is now your active character!");
+        await FollowupAsync($"{character.Name} is now your active character!", ephemeral: true);
     }
 
     [SlashCommand("view", "View your active character, or another character's info")]
@@ -97,7 +97,7 @@ public class CharacterInteractionCommands : InteractionModuleBase<SocketInteract
             var settings = DB.PlayerSettings.Find(Context.Guild.Id, Context.User.Id);
             if (settings is null)
             {
-                await RespondAsync("Couldn't fetch settings to find your active character!");
+                await RespondAsync("Couldn't fetch settings to find your active character!", ephemeral: true);
                 return;
             }
         
@@ -106,7 +106,7 @@ public class CharacterInteractionCommands : InteractionModuleBase<SocketInteract
             {
                 await RespondAsync(
                     "You don't appear to have an active character... are you trying to search for someone else's character?"
-                );
+                , ephemeral: true);
                 return;
             }
         }
@@ -128,7 +128,7 @@ public class CharacterInteractionCommands : InteractionModuleBase<SocketInteract
                 .WithDescription(contents)
                 .WithImageUrl(character.ImageUrl)
                 .WithColor(Color.DarkBlue)
-                .Build()
+                .Build(), ephemeral: true
         );
     }
 
@@ -149,7 +149,7 @@ public class CharacterInteractionCommands : InteractionModuleBase<SocketInteract
                 .WithDescription(string.Join("\n", nameList))
                 .WithFooter("Use /char view <character> to view more info.")
                 .WithColor(Color.DarkBlue)
-                .Build()
+                .Build(), ephemeral: true
         );
     }
 
@@ -181,7 +181,7 @@ public class CharacterInteractionCommands : InteractionModuleBase<SocketInteract
         var character = DB.Characters.FirstOrDefault(x => x.CharacterId == characterId);
         if (character is null)
         {
-            await RespondAsync("Wasn't able to find that character!");
+            await RespondAsync("Wasn't able to find that character!", ephemeral: true);
             return;
         }
 
@@ -189,11 +189,11 @@ public class CharacterInteractionCommands : InteractionModuleBase<SocketInteract
         {
             case "retired":
                 character.ActivityStatus = CharacterActivityStatus.RETIRED;
-                await RespondAsync("Your character has been retired!");
+                await RespondAsync("Your character has been retired!", ephemeral: true);
                 break;
             case "deceased":
                 character.ActivityStatus = CharacterActivityStatus.DECEASED;
-                await RespondAsync("Your character is now considered deceased");
+                await RespondAsync("Your character is now considered deceased", ephemeral: true);
                 break;
         }
         
@@ -209,7 +209,7 @@ public class CharacterInteractionCommands : InteractionModuleBase<SocketInteract
         var character = DB.Characters.FirstOrDefault(x => x.CharacterId == idParam);
         if (character is null)
         {
-            await RespondAsync("Wasn't able to find that character!");
+            await RespondAsync("Wasn't able to find that character!", ephemeral: true);
             return;
         }
 
@@ -218,7 +218,7 @@ public class CharacterInteractionCommands : InteractionModuleBase<SocketInteract
         character.ImageUrl = modal.ImageUrl;
 
         await DB.SaveChangesAsync();
-        await RespondAsync("Your character information has been successfully updated!");
+        await RespondAsync("Your character information has been successfully updated!", ephemeral: true);
     }
 
     public class EditCharacterModal : IModal

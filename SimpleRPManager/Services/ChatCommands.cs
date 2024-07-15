@@ -5,6 +5,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using SimpleRPManager.Context;
+using SimpleRPManager.Entities;
 using SimpleRPManager.Services.AutocompleteHandlers;
 
 namespace SimpleRPManager.Services;
@@ -45,6 +46,26 @@ public class ChatCommands : InteractionModuleBase<SocketInteractionContext>
             );
     }
 
+    public async Task FreeformSayAs(string name, string text)
+    {
+        await DeferAsync();
+
+        var channel = Context.Channel as SocketTextChannel;
+        var character = new Character(Context.Guild.Id, Context.User.Id, name);
+
+        var webhook = await CommonServices.GetChannelWebhook(channel);
+
+        if (await CommonServices.SendWebhookMessage(character, channel, text))
+        {
+            await DeleteOriginalResponseAsync();
+        }
+        else
+            await RespondAsync(
+                "Ran into an issue sending that message, try again later!",
+                ephemeral: true
+            );
+    }
+
     [SlashCommand("make-ic", "Initialize this channel as an RP channel!")]
     public async Task CreateChannelWebhook(SocketTextChannel? channel)
     {
@@ -58,7 +79,8 @@ public class ChatCommands : InteractionModuleBase<SocketInteractionContext>
         else
         {
             await RespondAsync(
-                "This channel is already an RP channel! If you wish to remove that status, simply delete the webhook in the channel's settings."
+                "This channel is already an RP channel! If you wish to remove that status, simply delete the webhook in the channel's settings.",
+                ephemeral: true
             );
         }
     }
